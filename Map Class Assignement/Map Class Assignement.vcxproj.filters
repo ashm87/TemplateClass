@@ -27,6 +27,9 @@
     <ClInclude Include="myMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="element.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

@@ -1,46 +1,27 @@
 #pragma once
-
-//The Element class holds the individual data for each item in the map.
-//K is the key data type and DT is the type of data that is to be stored
-template <typename K, typename DT>
-class Element
-{
-	//friend class myMap<K,DT> //Allows myMap class access to the private data of Element at the expense of tighter coupling.
-
-public:
-	K key;
-	DT data;
-};
+ 
+#include "element.h";
 
 template <typename K, typename DT>
 class myMap 
 {
-	
-private:
-	Element<K, DT> * elements;
+	typedef Element<K, DT> myElement;
 
+private:
+	myElement  *elements;
+	int size;
+		
 public:
 
 	//Constructor (setup the array)
-	myMap<K, DT>::myMap()
+	myMap();
+
+	myElement operator[] (int index)
 	{
-		elements = new Element[10];
+		return elements[index];
 	}
-	
-	//The insert operation checks if the key is already present and if it is then the value wont be inserted.
-	//If the array is almost full a new one is created and the contents copied over.
-	void myMap<K, DT>::insert(K key, DT &val)
-	{
-		/*A temporary element to store the data which is then stored
-		in the array.*/
-		Element<K, DT> * temp = new Element;
-		temp->key = key;
-		temp->data = val;
-
-		elements[0] = temp;
-
-
-	}
+		
+	void insert(const K &key, const DT &val);
 
 	//Modifies the data for the supplied key.
 	void update(K key, DT &newData);
@@ -59,3 +40,33 @@ public:
 	
 };
 
+template <typename K, typename DT>
+myMap<K, DT>::myMap()
+{
+	//An initial map with a size of 10 potential elements.
+	size = 10;
+	elements = new myElement[size];
+	
+	for (int i = 0; i < size; i++)
+	{
+		elements[i].data = 0;
+	}
+}
+
+//The insert operation checks if the key is already present and if it is then the value wont be inserted.
+//If the array is almost full a new one is created and the contents copied over.
+template <typename K, typename DT>
+void myMap<K, DT>::insert(const K &key, const DT &val)
+{
+
+	/*A temporary element to store the data which is then stored
+	in the array.*/
+
+	myElement *temp = new myElement;
+	temp->key = key;
+	temp->data = val;
+	
+	
+	
+	delete temp;
+}
