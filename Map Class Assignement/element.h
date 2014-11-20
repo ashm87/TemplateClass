@@ -11,5 +11,7 @@ class Element
 public:
 	K key;
 	DT data;
+
+	bool isEmpty = true; //Check if the element has been written to or not.
 };
 

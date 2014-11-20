@@ -11,11 +11,33 @@ using namespace std;
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	myMap<int, int> * test = new myMap <int, int >;
+	try{
 
-	
+		myMap<string, int> * test = new myMap < string, int > ;
 
+		myMap <int, int> test2;
 
+		test->insert("lemon", 5);
+		test->insert("lemon", 6);
+		test->insert("diamond", 500);
+		test->insert("emerald", 60000);
+		
+		test->insert("frog", 555333);
+		
+
+		cout << "test output is: " << test->find("diamnd");
+		
+		test->update("lemon", 855);
+
+		cout << "test output is: " << test->find("lemon");
+
+		//test2["car"] = 22;
+
+	}
+	catch (exception ex)
+	{
+		cout << ex.what() << endl;
+	}
 
 	return 0;
 }
