@@ -1,7 +1,6 @@
 #pragma once
 
 //The Element class holds the individual data for each item in the map.
-
 //K is the key data type and DT is the type of data that is to be stored
 template <typename K, typename DT>
 class Element
