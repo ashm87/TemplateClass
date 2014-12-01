@@ -1,5 +1,7 @@
 #pragma once
+
 #include "Element.h"
+#include "ElementNotFoundException.h"
 
 template <typename K, typename DT>
 class myMap 
@@ -7,17 +9,28 @@ class myMap
 	typedef Element<K, DT> myElement;
 
 private:
-	myElement  *elements; //Container for the data.
-	
+	myElement  *elements; //Container for the data.	
+	myElement nullElement; //To store once a deletion has been made.
+
 	int size; // Potential size of the map.
-	int numOfElements;// How many elements are held in the map.
+	int numOfElements;// How many elements are currently held in the map.
+
+	void resizeMap(); //Doubles the map size. Private: We want the map to manage this its self.
 		
 public:
 	myMap(); //constructor
-	~myMap();//destructor (free the memory)
 
-	//Operators:
-	DT& operator[](K key); //subscript for writing to
+	//Returns the potenital size of the map
+	int getCapacity(){
+		return size;
+	}
+	
+	//Returns how many elements are held in the map 
+	int getNumOfElements(){
+		return numOfElements;
+	}
+	
+	DT& operator[](K key); //subscript operator
 			
 	//Checks to see if the data is already in the Map
 	bool isData(K key)
@@ -29,40 +42,39 @@ public:
 		}
 		return false;
 	}
-
-	void resizeMap(); //doubles the map size
 		
-	void insert(const K &key, const DT &val); //inserts a new element into an empty position
+	void insert(const K &key, const DT &val); //Inserts a new element into an empty position
+	
+	DT& find(K key);//Returns the data with the associated key.
 
 	void update(K key, const DT &newData); //Modifies the data for the supplied key.
 	
-	DT& find(K key);//Returns the data with associated key.
-	
 	void erase(K key);//Erases the data for the given key.	
+
+	~myMap();//Destructor (free the memory)
 };
 
 //Constructor
 template <typename K, typename DT>
 myMap<K, DT>::myMap()
 {
-	//An initial map with a size of 10 potential elements.
+	//An initial map with a capacity of 8 potential elements.
 	size = 8;
 	numOfElements = 0;
 
 	elements = new myElement[size];
 }
 
-
 //Operator []
 template <typename K, typename DT>
 DT& myMap<K, DT>::operator[](K key)
 {
+	int emptyElement = -1;
+
 	if (numOfElements == size){
 		//Check if the array is full
 		resizeMap();
 	}
-
-	int emptyElement = -1;
 
 	for (int i = 0; i<size; i++)
 	{
@@ -76,12 +88,10 @@ DT& myMap<K, DT>::operator[](K key)
 
 	//If key isn't found then create a new element in the map to store the data.
 	myElement *temp = new myElement;
+	
 	temp->key = key;
-	temp->data = 0;
-	temp->isEmpty = false;
+	temp->isEmpty = false;	
 	elements[emptyElement] = *temp;
-
-	cout << "inserted at " << emptyElement<< ": " << elements[emptyElement].key << " " << elements[emptyElement].data << endl;// debug code
 
 	numOfElements++;
 
@@ -94,15 +104,13 @@ void myMap<K, DT>::resizeMap()
 {
 	myElement * tempElements = new myElement[size*2]; //Create an array with enough space to work with
 
-	std::copy(elements, elements + size, tempElements);
+	std::copy(elements, elements + size, tempElements);//Copy the array to temporary storage.
 
 	delete[] elements; //Delete the old data
 
 	elements = tempElements; //Reassign to the new data
 
 	size = size * 2; //Double the size.
-
-	cout << "resize called, the array is now:" << size << endl;
 }
 
 /**The insert operation checks if the key is already present and if it is then the value wont be inserted.
@@ -123,12 +131,11 @@ void myMap<K, DT>::insert(const K &key, const DT &val)
 		temp->isEmpty = false;
 
 		for (int i = 0; i < size; i++){	
-			if (elements[i].isEmpty)//Search for an empty element.
+			if (elements[i].isEmpty)
 			{
 				elements[i] = *temp;
-				cout << "inserted at " << i << ": " << elements[i].key << " " << elements[i].data << endl;// debug code
 				numOfElements++;
-				break;
+				break; //Only insert once
 			}
 		}
 		delete temp;
@@ -144,9 +151,9 @@ DT& myMap<K, DT>::find(K key)
 		if (elements[i].key == key && !elements[i].isEmpty)		
 		{
 			return elements[i].data;
-		}	
+		}
 	}
-	//Throw exception
+	throw ElementNotFoundException();
 }
 
 template <typename K, typename DT>
@@ -158,7 +165,6 @@ void myMap<K, DT>::update(K key, const DT &newData)
 			elements[i].data = newData;
 		}
 	}
-	//throw exception
 }
 
 template <typename K, typename DT>
@@ -166,14 +172,11 @@ void myMap<K, DT>::erase(K key)
 {
 	for (int i = 0; i<size; i++)
 	{
-		if (elements[i].key == key){			
-			elements[i].data = 0;
-			elements[i].isEmpty = true; // Ready to be written to again.
-
-			numOfElements--; //decriment, more space to write to in the map again.
+		if (elements[i].key == key){
+			elements[i] = nullElement;
+			numOfElements--; //decriment, more space to write to in the map.
 		}
 	}
-	//throw exception
 }
 
 template<typename K, typename DT>
